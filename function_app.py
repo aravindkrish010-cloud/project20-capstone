@@ -1,7 +1,7 @@
 import azure.functions as func
 import logging
 import os
-import pyodbc
+import pytds
 
 app = func.FunctionApp()
 
@@ -10,8 +10,12 @@ def GetStatus(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Capstone API: checking database connectivity.')
 
     try:
-        conn_str = os.environ["SQL_CONNECTION_STRING"]
-        conn = pyodbc.connect(conn_str, timeout=5)
+        server = os.environ["SQL_SERVER"]
+        database = os.environ["SQL_DATABASE"]
+        user = os.environ["SQL_USER"]
+        password = os.environ["SQL_PASSWORD"]
+
+        conn = pytds.connect(server, database, user, password, timeout=5)
         cursor = conn.cursor()
         cursor.execute("SELECT @@VERSION")
         row = cursor.fetchone()
